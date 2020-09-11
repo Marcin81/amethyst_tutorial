@@ -2,11 +2,14 @@ use amethyst::{
     core::transform::Transform,
     core::SystemDesc,
     derive::SystemDesc,
-    ecs::{Join, System, SystemData, World, WriteStorage, ReadExpect, Write},
+    ecs::{Join, System, SystemData, World, WriteStorage, ReadExpect, Write, Read},
     ui::UiText,
+    assets::AssetStorage,
+    audio::{output::Output, Source},
 };
 
 use crate::pong::{Ball, ScoreBoard, ScoreText, ARENA_WIDTH, ARENA_HEIGHT};
+use crate::audio::{play_score_sound, Sounds};
 
 #[derive(SystemDesc)]
 pub struct WinnerSystem;
@@ -18,6 +21,9 @@ impl<'s> System<'s> for WinnerSystem {
         WriteStorage<'s, UiText>,
         Write<'s, ScoreBoard>,
         ReadExpect<'s, ScoreText>,
+        Read<'s, AssetStorage<Source>>,
+        ReadExpect<'s, Sounds>,
+        Option<Read<'s, Output>>,
     );
 
     fn run(&mut self, (
@@ -25,8 +31,11 @@ impl<'s> System<'s> for WinnerSystem {
         mut locals,
         mut ui_text,
         mut scores,
-        score_text
-        ): Self::SystemData) {
+        score_text,
+        storage,
+        sounds,
+        audio_output,
+    ): Self::SystemData)  {
         for (ball, transform) in (&mut balls, &mut locals).join() {
             let ball_x = transform.translation().x;
 
@@ -57,6 +66,7 @@ impl<'s> System<'s> for WinnerSystem {
                 ball.velocity[0] = -ball.velocity[0]; // Reverse Direction
                 transform.set_translation_x(ARENA_WIDTH / 2.0); // Reset Position
                 transform.set_translation_y(ARENA_HEIGHT / 2.0); // Reset Position
+                play_score_sound(&*sounds, &storage, audio_output.as_deref());
                 // Print the scoreboard.
                 println!(
                     "Score: | {:^3} | {:^3} |",

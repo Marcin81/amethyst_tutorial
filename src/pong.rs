@@ -1,4 +1,5 @@
 extern crate amethyst;
+use crate::audio::initialise_audio;
 
 use amethyst::{
     assets::{AssetStorage, Loader, Handle},
@@ -47,6 +48,7 @@ impl SimpleState for Pong {
         initialise_paddles(world, self.sprite_sheet_handle.clone().unwrap());
         initialise_camera(world);
         initialise_scoreboard(world);
+        initialise_audio(world);
     }
 
     fn update(&mut self, data: &mut StateData<'_, GameData<'_, '_>>) -> SimpleTrans {
