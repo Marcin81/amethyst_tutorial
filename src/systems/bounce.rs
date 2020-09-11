@@ -1,9 +1,8 @@
 use amethyst::{
     assets::AssetStorage,
     audio::{output::Output, Source},
-    core::{Transform, SystemDesc},
-    derive::SystemDesc,
-    ecs::{Read, ReadExpect, Join, ReadStorage, System, SystemData, World, WriteStorage},
+    core::{Transform},
+    ecs::{Read, ReadExpect, Join, ReadStorage, System, WriteStorage},
 };
 
 use crate::pong::{Ball, Side, Paddle, ARENA_HEIGHT};
